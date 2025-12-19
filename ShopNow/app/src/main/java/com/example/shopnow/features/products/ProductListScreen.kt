@@ -36,8 +36,10 @@ object ProductTags {
 fun ProductListScreen(
     uiState: ProductListUiState,
     isRefreshing: Boolean,
-    onRefresh: () -> Unit
-) {
+    onRefresh: () -> Unit,
+    onProductClick: (Product) -> Unit
+)
+{
     val listState = rememberLazyListState()
     val density = LocalDensity.current
 
@@ -144,7 +146,10 @@ fun ProductListScreen(
                             contentPadding = PaddingValues(bottom = 12.dp)
                         ) {
                             items(uiState.items) { p ->
-                                ProductCard(product = p)
+                                ProductCard(
+                                    product = p,
+                                    onClick = onProductClick
+                                )
                             }
                         }
                     }
@@ -203,11 +208,13 @@ fun ProductListScreen(
 }
 
 @Composable
-private fun ProductCard(product: Product) {
+private fun ProductCard(product: Product,
+                        onClick: (Product) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .testTag(ProductTags.ITEM_PREFIX + product.id),
+        onClick = { onClick(product) },
         shape = MaterialTheme.shapes.large,
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
