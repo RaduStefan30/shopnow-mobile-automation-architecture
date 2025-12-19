@@ -34,7 +34,6 @@ fun SettingsScreen(
             .testTag(SettingsTags.SCREEN)
     ) {
 
-        // 🔝 HEADER — full width, no horizontal padding
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -60,7 +59,6 @@ fun SettingsScreen(
             )
         }
 
-        // 👇 CONTENT — padded horizontally
         Column(
             modifier = Modifier
                 .fillMaxSize()

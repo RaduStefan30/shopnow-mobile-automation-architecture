@@ -33,7 +33,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.draw.clip
 
 
 object ProductTags {
@@ -60,10 +59,8 @@ fun ProductListScreen(
     val refreshThresholdPx = with(density) { 90.dp.toPx() }
     val refreshHoldPx = with(density) { 56.dp.toPx() }
 
-    // how much user has pulled down
     var pulledPx by remember { mutableFloatStateOf(0f) }
 
-    // avoid capturing stale lambda
     val onRefreshLatest by rememberUpdatedState(onRefresh)
 
     val hasData = uiState is ProductListUiState.Data
@@ -97,8 +94,6 @@ fun ProductListScreen(
             }
         }
     }
-
-    // Content offset: whole UI moves with finger (elastic), and stays slightly down while refreshing
     val targetOffsetPx = when {
         isRefreshing -> refreshHoldPx
         hasData -> pulledPx / 2f
@@ -108,8 +103,6 @@ fun ProductListScreen(
         targetValue = targetOffsetPx,
         label = "contentOffset"
     )
-
-    // Header height animates with pull, or stays visible while refreshing
     val headerTargetDp = when {
         isRefreshing -> 56.dp
         hasData && pulledPx > 0f -> with(density) { (pulledPx / 2f).toDp().coerceAtMost(56.dp) }
@@ -129,7 +122,6 @@ fun ProductListScreen(
                 start = 16.dp, end = 16.dp, top = 48.dp, bottom = 24.dp
             )
     ) {
-        // MAIN CONTENT (moves down on pull)
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -200,8 +192,6 @@ fun ProductListScreen(
                 }
             }
         }
-
-        // HEADER (stays at top, shows spinner/text)
         if (hasData) {
             Box(
                 modifier = Modifier
@@ -259,11 +249,10 @@ private fun ProductCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column {
-            // Image block (uniform look)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(1.6f) // a bit wider than square; change to 1f if you want square
+                    .aspectRatio(1.6f)
             ) {
                 Image(
                     painter = painterResource(product.imageRes),
@@ -272,7 +261,6 @@ private fun ProductCard(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // Heart overlay (top-right)
                 Icon(
                     imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                     contentDescription = "Toggle favourite",

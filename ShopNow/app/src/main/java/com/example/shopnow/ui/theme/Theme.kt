@@ -7,7 +7,6 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-// ================= DARK (poți să-l ignori momentan) =================
 private val DarkColorScheme = darkColorScheme(
     primary = Primary,
     secondary = Accent,
@@ -19,7 +18,6 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = Color.White
 )
 
-// ================= LIGHT – FOLOSIT =================
 private val LightColorScheme = lightColorScheme(
     primary = Primary,            // #7653FF
     secondary = Accent,           // #FF6CAB

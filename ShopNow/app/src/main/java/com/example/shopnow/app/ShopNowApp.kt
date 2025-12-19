@@ -10,8 +10,12 @@ import com.example.shopnow.features.products.ProductListScreen
 import com.example.shopnow.features.products.ProductListUiState
 import com.example.shopnow.features.settings.SettingsScreen
 
-private enum class AppRoute { LOGIN, PRODUCTS, PRODUCT_DETAIL, SETTINGS }
-
+private enum class AppRoute {
+    LOGIN,
+    PRODUCTS,
+    PRODUCT_DETAIL,
+    SETTINGS
+}
 
 @Composable
 fun ShopNowApp() {
@@ -20,54 +24,62 @@ fun ShopNowApp() {
     val userEmailState = remember { mutableStateOf<String?>(null) }
     var selectedProduct by remember { mutableStateOf<Product?>(null) }
     val favoriteIds = remember { mutableStateOf(setOf<String>()) }
+    var productsUiState by remember {
+        mutableStateOf<ProductListUiState>(ProductListUiState.Loading)
+    }
+    var isRefreshing by remember { mutableStateOf(false) }
+    var hasLoadedProducts by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
 
     val errorMessageState = remember { mutableStateOf<String?>(null) }
     val validEmail = "test"
     val validPassword = "radu"
 
+    fun loadProducts(initial: Boolean) {
+        scope.launch {
+            if (!initial) isRefreshing = true
+            try {
+                val items = backend.fetchProducts()
+                productsUiState = ProductListUiState.Data(items)
+            } catch (_: Throwable) {
+                productsUiState = ProductListUiState.Error("Failed to load products")
+            } finally {
+                if (!initial) isRefreshing = false
+            }
+        }
+    }
+
+    LaunchedEffect(route) {
+        if (route == AppRoute.PRODUCTS && !hasLoadedProducts) {
+            loadProducts(initial = true)
+            hasLoadedProducts = true
+        }
+    }
 
     when (route) {
+
         AppRoute.LOGIN -> {
             LoginScreen(
                 errorMessage = errorMessageState.value,
                 onLoginClick = { email, password ->
                     val ok = (email == validEmail && password == validPassword)
-                    errorMessageState.value = if (ok) null else "Invalid email or password"
-                    if (ok) {
-                        route = AppRoute.PRODUCTS
-                        userEmailState.value = email
-                    }
+                    errorMessageState.value =
+                        if (ok) null else "Invalid email or password"
 
+                    if (ok) {
+                        userEmailState.value = email
+                        route = AppRoute.PRODUCTS
+                    }
                 }
             )
         }
 
         AppRoute.PRODUCTS -> {
-            var uiState by remember { mutableStateOf<ProductListUiState>(ProductListUiState.Loading) }
-            var isRefreshing by remember { mutableStateOf(false) }
-            val scope = rememberCoroutineScope()
-
-
-            fun load(initial: Boolean) {
-                scope.launch {
-                    if (!initial) isRefreshing = true
-                    try {
-                        val items = backend.fetchProducts()
-                        uiState = ProductListUiState.Data(items)
-                    } catch (_: Throwable) {
-                        uiState = ProductListUiState.Error("Failed to load products")
-                    } finally {
-                        if (!initial) isRefreshing = false
-                    }
-                }
-            }
-
-            LaunchedEffect(Unit) { load(initial = true) }
-
             ProductListScreen(
-                uiState = uiState,
+                uiState = productsUiState,
                 isRefreshing = isRefreshing,
-                onRefresh = { load(initial = false) },
+                onRefresh = { loadProducts(initial = false) },
                 favoriteIds = favoriteIds.value,
                 onToggleFavorite = { productId ->
                     favoriteIds.value =
@@ -85,16 +97,18 @@ fun ShopNowApp() {
         }
 
         AppRoute.PRODUCT_DETAIL -> {
-            val p = selectedProduct!!
-            val isFav = favoriteIds.value.contains(p.id)
+            val product = selectedProduct!!
+            val isFav = favoriteIds.value.contains(product.id)
 
             ProductDetailScreen(
-                product = p,
+                product = product,
                 isFavorite = isFav,
                 onToggleFavorite = {
                     favoriteIds.value =
-                        if (isFav) favoriteIds.value - p.id
-                        else favoriteIds.value + p.id
+                        if (isFav)
+                            favoriteIds.value - product.id
+                        else
+                            favoriteIds.value + product.id
                 },
                 onBack = { route = AppRoute.PRODUCTS }
             )
@@ -105,10 +119,11 @@ fun ShopNowApp() {
                 userEmail = userEmailState.value,
                 onBack = { route = AppRoute.PRODUCTS },
                 onLogout = {
-                    // session reset
                     userEmailState.value = null
                     selectedProduct = null
                     favoriteIds.value = emptySet()
+                    productsUiState = ProductListUiState.Loading
+                    hasLoadedProducts = false
                     route = AppRoute.LOGIN
                 }
             )

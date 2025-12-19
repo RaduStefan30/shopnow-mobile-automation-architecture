@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
@@ -17,8 +18,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.shopnow.data.Product
-import androidx.compose.material.icons.filled.ArrowBack
-
 
 object ProductDetailTags {
     const val SCREEN = "product_detail_screen"
@@ -52,7 +51,7 @@ fun ProductDetailScreen(
                 modifier = Modifier.testTag(ProductDetailTags.BACK)
             ) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back"
                 )
             }
@@ -81,7 +80,6 @@ fun ProductDetailScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // 📝 TITLE + FAV
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -95,6 +93,10 @@ fun ProductDetailScreen(
             Icon(
                 imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                 contentDescription = "Toggle favourite",
+                tint = if (isFavorite)
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 modifier = Modifier
                     .size(28.dp)
                     .testTag(ProductDetailTags.TOGGLE_FAV)
