@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -25,10 +27,26 @@ import com.example.shopnow.ui.theme.Accent
 import com.example.shopnow.ui.theme.Peach
 import com.example.shopnow.ui.theme.Primary
 
+
+object LoginTags {
+    const val SCREEN = "login_screen"
+    const val LOGO = "login_logo"
+    const val EMAIL = "login_email"
+    const val PASSWORD = "login_password"
+    const val REMEMBER_ME = "login_remember_me"
+    const val FORGOT_PASSWORD = "login_forgot_password"
+    const val LOGIN_BUTTON = "login_button"
+    const val SIGN_UP = "login_sign_up"
+    const val FOOTER = "login_footer"
+    const val ERROR = "login_error"
+}
+
 @Composable
 fun LoginScreen(
-    onLoginClick: (email: String, password: String) -> Unit = { _, _ -> }
+    onLoginClick: (email: String, password: String) -> Unit,
+    errorMessage: String? = null
 ) {
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var rememberMe by remember { mutableStateOf(false) }
@@ -37,6 +55,7 @@ fun LoginScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Peach)
+            .testTag(LoginTags.SCREEN)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             HeaderPeach(modifier = Modifier.height(200.dp))
@@ -53,6 +72,14 @@ fun LoginScreen(
                     fontWeight = FontWeight.SemiBold
                 )
 
+                if (errorMessage != null) {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.testTag(LoginTags.ERROR)
+                    )
+                }
+
                 Spacer(Modifier.height(18.dp))
 
                 OutlinedTextField(
@@ -61,7 +88,9 @@ fun LoginScreen(
                     label = { Text("Email") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(LoginTags.EMAIL),
                     shape = MaterialTheme.shapes.large
                 )
 
@@ -74,7 +103,9 @@ fun LoginScreen(
                     singleLine = true,
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(LoginTags.PASSWORD),
                     shape = MaterialTheme.shapes.large
                 )
 
@@ -87,12 +118,14 @@ fun LoginScreen(
                     Checkbox(
                         checked = rememberMe,
                         onCheckedChange = { rememberMe = it },
+                        modifier = Modifier.testTag(LoginTags.REMEMBER_ME),
                         colors = CheckboxDefaults.colors(
                             checkedColor = Primary,
                             uncheckedColor = Primary.copy(alpha = 0.6f),
                             checkmarkColor = Color.White
                         )
                     )
+
                     Text(
                         text = "Remember me",
                         style = MaterialTheme.typography.bodySmall,
@@ -105,7 +138,9 @@ fun LoginScreen(
                         text = "Forgot password?",
                         style = MaterialTheme.typography.bodySmall,
                         color = Primary,
-                        modifier = Modifier.clickable { }
+                        modifier = Modifier
+                            .testTag(LoginTags.FORGOT_PASSWORD)
+                            .clickable { /* no-op for demo */ }
                     )
                 }
 
@@ -115,7 +150,8 @@ fun LoginScreen(
                     onClick = { onLoginClick(email.trim(), password) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(54.dp),
+                        .height(54.dp)
+                        .testTag(LoginTags.LOGIN_BUTTON),
                     shape = MaterialTheme.shapes.large,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Primary,
@@ -138,16 +174,19 @@ fun LoginScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = Primary,
                         fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.clickable { }
+                        modifier = Modifier
+                            .testTag(LoginTags.SIGN_UP)
+                            .clickable { /* no-op for demo */ }
                     )
                 }
 
                 Spacer(Modifier.weight(1f))
 
                 Text(
-                    text = "Demo app • QA Automation",
+                    text = "Demo app • QA exercise",
                     style = MaterialTheme.typography.labelSmall,
-                    color = Accent.copy(alpha = 0.95f)
+                    color = Accent.copy(alpha = 0.95f),
+                    modifier = Modifier.testTag(LoginTags.FOOTER)
                 )
             }
         }
@@ -157,9 +196,11 @@ fun LoginScreen(
             contentDescription = "ShopNow logo",
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = 120.dp)
+                .statusBarsPadding()
+                .padding(top = 24.dp)
                 .height(50.dp)
                 .zIndex(10f)
+                .testTag(LoginTags.LOGO)
         )
     }
 }
@@ -208,8 +249,8 @@ private fun DrawScope.drawWavyTopBackground(
     color: Color,
     waveH: Float,
     backWaveColor: Color = Primary,
-    backXOffsetDp: Float = 0f,          // your -50f, but configurable (in dp)
-    backYOffsetFactor: Float = -0.15f     // your -waveH * 0.15f, configurable
+    backXOffsetDp: Float = 0f,
+    backYOffsetFactor: Float = -0.15f
 ) {
     val w = size.width
     val h = size.height
@@ -217,31 +258,11 @@ private fun DrawScope.drawWavyTopBackground(
     val backX = backXOffsetDp.dp.toPx()
     val backY = waveH * backYOffsetFactor
 
-    // Back wave FIRST (so it's behind)
-    val backWave = buildWavePath(
-        w = w,
-        h = h,
-        waveH = waveH,
-        x = backX,
-        y = backY
-    )
-    drawPath(
-        path = backWave,
-        color = backWaveColor
-    )
+    val backWave = buildWavePath(w = w, h = h, waveH = waveH, x = backX, y = backY)
+    drawPath(path = backWave, color = backWaveColor)
 
-    // Main wave on top
-    val mainWave = buildWavePath(
-        w = w,
-        h = h,
-        waveH = waveH,
-        x = 0f,
-        y = 0f
-    )
-    drawPath(
-        path = mainWave,
-        color = color
-    )
+    val mainWave = buildWavePath(w = w, h = h, waveH = waveH, x = 0f, y = 0f)
+    drawPath(path = mainWave, color = color)
 }
 
 private fun buildWavePath(
