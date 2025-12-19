@@ -1,5 +1,6 @@
 package com.example.shopnow.data
 
+import com.example.shopnow.R
 import kotlinx.coroutines.delay
 
 class FakeBackend(
@@ -12,20 +13,20 @@ class FakeBackend(
         fetchCount++
 
         val base = listOf(
-            Product("1", "Purple Hoodie", "€49.99"),
-            Product("2", "Pink Sneakers", "€89.00"),
-            Product("3", "Wireless Earbuds", "€129.00"),
-            Product("4", "Smart Watch", "€199.00"),
+            Product("1","Neon Green Sneakers","€89.00","Lightweight neon green sneakers with great comfort.", R.drawable.shoes1),
+            Product("2","Red Sneakers","€89.00","Lightweight red sneakers with great comfort.", R.drawable.shoes2),
+            Product("3","Black T-Shirt","€19.00","Soft and premium T-Shirt made from unicorn hair.", R.drawable.t_shirt),
+            Product("4","Navi Shirt","€199.00","Probably a navy Shirt", R.drawable.shirt),
         )
 
-        // Make refresh visibly different
         val extra = Product(
             id = "r$fetchCount",
-            name = "Refresh item #$fetchCount",
-            price = "€${9 + fetchCount}.00"
+            name = "Promotional refreshable item #$fetchCount",
+            price = "€${9 + fetchCount}.00",
+            description = "This item appears after refresh to prove refresh works.",
+            imageRes = R.drawable.cap
         )
 
-        // On first load, return base only; on refresh, add extra
         return if (fetchCount == 1) base else (listOf(extra) + base)
     }
 }

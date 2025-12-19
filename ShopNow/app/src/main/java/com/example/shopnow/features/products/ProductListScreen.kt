@@ -23,6 +23,14 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import com.example.shopnow.data.Product
 import kotlin.math.min
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
+
 
 object ProductTags {
     const val SCREEN = "products_screen"
@@ -37,8 +45,12 @@ fun ProductListScreen(
     uiState: ProductListUiState,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
-    onProductClick: (Product) -> Unit
+    favoriteIds: Set<String>,
+    onToggleFavorite: (String) -> Unit,
+    onProductClick: (Product) -> Unit,
+    onOpenSettings: () -> Unit
 )
+
 {
     val listState = rememberLazyListState()
     val density = LocalDensity.current
@@ -110,7 +122,9 @@ fun ProductListScreen(
             .fillMaxSize()
             .testTag(ProductTags.SCREEN)
             .nestedScroll(connection)
-            .padding(16.dp)
+            .padding(
+                start = 16.dp, end = 16.dp, top = 48.dp, bottom = 24.dp
+            )
     ) {
         // MAIN CONTENT (moves down on pull)
         Box(
@@ -128,13 +142,28 @@ fun ProductListScreen(
                 }
                 is ProductListUiState.Data -> {
                     Column {
-                        Text(
-                            text = "Products",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(top = 48.dp, bottom = 24.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Products",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.weight(1f)
+                            )
 
-                        )
+                            IconButton(
+                                onClick = onOpenSettings,
+                                modifier = Modifier.testTag("products_open_settings")
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Settings,
+                                    contentDescription = "Settings"
+                                )
+                            }
+                        }
+
                         Spacer(Modifier.height(12.dp))
 
                         LazyColumn(
@@ -148,9 +177,12 @@ fun ProductListScreen(
                             items(uiState.items) { p ->
                                 ProductCard(
                                     product = p,
+                                    isFavorite = favoriteIds.contains(p.id),
+                                    onToggleFavorite = onToggleFavorite,
                                     onClick = onProductClick
                                 )
                             }
+
                         }
                     }
                 }
@@ -208,8 +240,12 @@ fun ProductListScreen(
 }
 
 @Composable
-private fun ProductCard(product: Product,
-                        onClick: (Product) -> Unit) {
+private fun ProductCard(
+    product: Product,
+    isFavorite: Boolean,
+    onToggleFavorite: (String) -> Unit,
+    onClick: (Product) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -219,27 +255,37 @@ private fun ProductCard(product: Product,
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = product.name,
+                    product.name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "Tap to view details",
+                    product.description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    maxLines = 1
                 )
             }
 
-            Text(
-                text = product.price,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
+            Spacer(Modifier.width(8.dp))
+
+            Icon(
+                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                contentDescription = "Toggle favourite",
+                tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .size(24.dp)
+                    .testTag("fav_toggle_${product.id}")
+                    .clickable {
+                        onToggleFavorite(product.id)
+                    }
             )
         }
     }
