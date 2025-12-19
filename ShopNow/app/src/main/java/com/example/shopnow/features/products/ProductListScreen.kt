@@ -30,6 +30,10 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.clip
 
 
 object ProductTags {
@@ -49,9 +53,7 @@ fun ProductListScreen(
     onToggleFavorite: (String) -> Unit,
     onProductClick: (Product) -> Unit,
     onOpenSettings: () -> Unit
-)
-
-{
+) {
     val listState = rememberLazyListState()
     val density = LocalDensity.current
 
@@ -74,7 +76,8 @@ fun ProductListScreen(
                 available: Offset,
                 source: NestedScrollSource
             ): Offset {
-                val atTop = listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0
+                val atTop =
+                    listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0
 
                 // available.y > 0 means user drags down and child can't consume more scroll
                 if (source == NestedScrollSource.UserInput && available.y > 0 && atTop && hasData && !isRefreshing) {
@@ -140,6 +143,7 @@ fun ProductListScreen(
                             .testTag(ProductTags.LOADING)
                     )
                 }
+
                 is ProductListUiState.Data -> {
                     Column {
                         Row(
@@ -164,16 +168,16 @@ fun ProductListScreen(
                             }
                         }
 
-                        Spacer(Modifier.height(12.dp))
-
+                        Spacer(Modifier.height(32.dp))
                         LazyColumn(
                             state = listState,
                             modifier = Modifier
                                 .fillMaxSize()
                                 .testTag(ProductTags.LIST),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            contentPadding = PaddingValues(bottom = 12.dp)
-                        ) {
+                            verticalArrangement = Arrangement.spacedBy(14.dp),
+                            contentPadding = PaddingValues(bottom = 20.dp)
+                        )
+                        {
                             items(uiState.items) { p ->
                                 ProductCard(
                                     product = p,
@@ -252,41 +256,60 @@ private fun ProductCard(
             .testTag(ProductTags.ITEM_PREFIX + product.id),
         onClick = { onClick(product) },
         shape = MaterialTheme.shapes.large,
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    product.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
+        Column {
+            // Image block (uniform look)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1.6f) // a bit wider than square; change to 1f if you want square
+            ) {
+                Image(
+                    painter = painterResource(product.imageRes),
+                    contentDescription = product.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    product.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 1
+
+                // Heart overlay (top-right)
+                Icon(
+                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                    contentDescription = "Toggle favourite",
+                    tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(10.dp)
+                        .size(26.dp)
+                        .testTag("fav_toggle_${product.id}")
+                        .clickable { onToggleFavorite(product.id) }
                 )
             }
 
-            Spacer(Modifier.width(8.dp))
+            Column(modifier = Modifier.padding(14.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = product.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = product.price,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
 
-            Icon(
-                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                contentDescription = "Toggle favourite",
-                tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier
-                    .size(24.dp)
-                    .testTag("fav_toggle_${product.id}")
-                    .clickable {
-                        onToggleFavorite(product.id)
-                    }
-            )
+                Spacer(Modifier.height(6.dp))
+
+                Text(
+                    text = product.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f),
+                    maxLines = 2
+                )
+            }
         }
     }
 }

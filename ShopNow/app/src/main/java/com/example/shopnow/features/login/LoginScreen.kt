@@ -197,7 +197,7 @@ fun LoginScreen(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .statusBarsPadding()
-                .padding(top = 24.dp)
+                .padding(top = 96.dp)
                 .height(50.dp)
                 .zIndex(10f)
                 .testTag(LoginTags.LOGO)

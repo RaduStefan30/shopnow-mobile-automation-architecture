@@ -31,13 +31,15 @@ fun SettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
             .testTag(SettingsTags.SCREEN)
-            .padding( top = 32.dp)
     ) {
+
+        // 🔝 HEADER — full width, no horizontal padding
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 24.dp)
         ) {
             IconButton(
                 onClick = onBack,
@@ -58,69 +60,81 @@ fun SettingsScreen(
             )
         }
 
-        Spacer(Modifier.height(100.dp))
+        // 👇 CONTENT — padded horizontally
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp)
+        ) {
 
-        Text(
-            text = "User information",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold
-        )
-        Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(12.dp))
 
-        Card(shape = MaterialTheme.shapes.large) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "Email", style = MaterialTheme.typography.labelMedium)
-                Text(
-                    text = userEmail ?: "—",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
+            Text(
+                text = "User information",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
 
-        Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(8.dp))
 
-        Text(
-            text = "Appearance",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold
-        )
-        Spacer(Modifier.height(8.dp))
-
-        Card(shape = MaterialTheme.shapes.large) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Dark theme", fontWeight = FontWeight.Medium)
-                    Spacer(Modifier.height(2.dp))
+            Card(shape = MaterialTheme.shapes.large) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Email", style = MaterialTheme.typography.labelMedium)
                     Text(
-                        "Visible only (demo). Does not change the app theme.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        text = userEmail ?: "—",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium
                     )
                 }
-                Switch(
-                    checked = darkThemeUiOnly,
-                    onCheckedChange = { darkThemeUiOnly = it },
-                    modifier = Modifier.testTag(SettingsTags.DARK_TOGGLE)
-                )
             }
-        }
 
-        Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(20.dp))
 
-        Button(
-            onClick = onLogout,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
-                .testTag(SettingsTags.LOGOUT)
-        ) {
-            Text("Log out")
+            Text(
+                text = "Appearance",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Card(shape = MaterialTheme.shapes.large) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Dark theme", fontWeight = FontWeight.Medium)
+                        Spacer(Modifier.height(2.dp))
+                        Text(
+                            "Visible only (demo). Does not change the app theme.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                    }
+                    Switch(
+                        checked = darkThemeUiOnly,
+                        onCheckedChange = { darkThemeUiOnly = it },
+                        modifier = Modifier.testTag(SettingsTags.DARK_TOGGLE)
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(32.dp))
+
+            Button(
+                onClick = onLogout,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+                    .testTag(SettingsTags.LOGOUT)
+            ) {
+                Text("Log out")
+            }
+
+            Spacer(Modifier.height(16.dp))
         }
     }
 }
