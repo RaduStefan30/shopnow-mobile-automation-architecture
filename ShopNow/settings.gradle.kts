@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ShopNow"
+rootProject.name = "ShopNowAndroid"
 include(":app")
