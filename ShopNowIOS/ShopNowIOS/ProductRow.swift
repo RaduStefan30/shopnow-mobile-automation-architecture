@@ -4,6 +4,7 @@
 //
 //  Created by Radu-Stefan Ranzascu on 21.12.2025.
 //
+
 import SwiftUI
 
 struct ProductRow: View {
@@ -16,17 +17,32 @@ struct ProductRow: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(spacing: 0) {
 
-            // Image header (similar to Android card image)
-            Image(product.imageName)
-                .resizable()
-                .scaledToFill()
-                .frame(height: 180)          // <- mărește imaginea (era 84)
-                .clipped()
+            ZStack(alignment: .topTrailing) {
+                Image(product.imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(height: 180)
+                    .clipped()
 
-            // Content
+                Button {
+                    appState.toggleFavorite(productId: product.id)
+                } label: {
+                    Image(systemName: isFavorite ? "heart.fill" : "heart")
+                        .font(.title3)
+                        .foregroundStyle(Theme.primary)
+                        .padding(10)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .padding(10)
+                .accessibilityIdentifier("favToggle_\(product.id)")
+            }
+
             HStack(alignment: .top, spacing: 12) {
+
                 VStack(alignment: .leading, spacing: 6) {
                     Text(product.name)
                         .font(.headline)
@@ -37,30 +53,19 @@ struct ProductRow: View {
                         .font(.subheadline)
                         .foregroundStyle(.black.opacity(0.60))
                         .lineLimit(2)
-
-                    Text(product.price)
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.black)
                 }
 
                 Spacer()
 
-                // Heart on the far right (as requested)
-                Button {
-                    appState.toggleFavorite(productId: product.id)
-                } label: {
-                    Image(systemName: isFavorite ? "heart.fill" : "heart")
-                        .font(.title3)
-                        .foregroundStyle(Theme.primary)
-                        .padding(10)
-                        .background(.white.opacity(0.9))
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("favToggle_\(product.id)")
+                Text(product.price)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.black)
+                    .padding(.top, 2)
+                    .accessibilityIdentifier("price_\(product.id)")
             }
             .padding(14)
+            .background(Color.black.opacity(0.04))
         }
         .background(Color.white)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))

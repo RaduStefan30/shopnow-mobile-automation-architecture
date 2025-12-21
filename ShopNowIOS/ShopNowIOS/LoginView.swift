@@ -57,10 +57,12 @@ struct LoginView: View {
                                 .autocorrectionDisabled(true)
                                 .keyboardType(.emailAddress)
                                 .accessibilityIdentifier("loginEmail")
+                                .padding(2)
 
                             SecureField("Password", text: $password)
                                 .textFieldStyle(.roundedBorder)
                                 .accessibilityIdentifier("loginPassword")
+                                .padding(2)
 
                             if let errorMessage {
                                 Text(errorMessage)

@@ -143,7 +143,7 @@ fun ProductListScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Products",
+                                text = "",
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 modifier = Modifier.weight(1f)
