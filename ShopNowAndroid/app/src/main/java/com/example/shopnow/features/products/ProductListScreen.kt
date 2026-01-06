@@ -41,6 +41,8 @@ object ProductTags {
     const val LIST = "products_list"
     const val REFRESHING = "products_refreshing"
     const val ITEM_PREFIX = "product_item_"
+    const val SETTINGS = "products_settings"
+    const val FAV_PREFIX = "product_fav_"
 }
 
 @Composable
@@ -151,7 +153,7 @@ fun ProductListScreen(
 
                             IconButton(
                                 onClick = onOpenSettings,
-                                modifier = Modifier.testTag("products_open_settings")
+                                modifier = Modifier.testTag(ProductTags.SETTINGS)
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.Settings,
@@ -269,7 +271,7 @@ private fun ProductCard(
                         .align(Alignment.TopEnd)
                         .padding(10.dp)
                         .size(26.dp)
-                        .testTag("fav_toggle_${product.id}")
+                        .testTag(ProductTags.FAV_PREFIX+product.id)
                         .clickable { onToggleFavorite(product.id) }
                 )
             }
