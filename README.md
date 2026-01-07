@@ -1,4 +1,4 @@
-# ShopNow Mobile — QA Mobile Architect Exercise
+# ShopNow Mobile — Mobile QA Architect Exercise
 
 This repository contains a **demo mobile e-commerce application** built to demonstrate **QA strategy, testability, automation readiness, async handling, and performance considerations**, as requested in the **QA Mobile Architect technical exercise**.
 
