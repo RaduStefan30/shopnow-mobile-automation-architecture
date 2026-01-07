@@ -49,6 +49,7 @@ struct ProductDetailView: View {
                                 .background(.ultraThinMaterial)
                                 .clipShape(Circle())
                         }
+                        .accessibilityValue(isFavorite ? "on" : "off")
                         .accessibilityIdentifier("detailFavToggle")
                         .padding()
                     }
@@ -70,7 +71,6 @@ struct ProductDetailView: View {
             }
         }
         .navigationBarBackButtonHidden(false)
-        .accessibilityIdentifier("productDetail")
     }
     }
 }

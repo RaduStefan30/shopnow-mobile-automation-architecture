@@ -58,11 +58,13 @@ struct LoginView: View {
                                 .keyboardType(.emailAddress)
                                 .accessibilityIdentifier("loginEmail")
                                 .padding(2)
+                                .textContentType(.none)
 
                             SecureField("Password", text: $password)
                                 .textFieldStyle(.roundedBorder)
                                 .accessibilityIdentifier("loginPassword")
                                 .padding(2)
+                                .textContentType(.none)
 
                             if let errorMessage {
                                 Text(errorMessage)
@@ -116,7 +118,7 @@ struct LoginView: View {
         let e = email.trimmingCharacters(in: .whitespacesAndNewlines)
         let p = password
 
-        if e == "test" && p == "radu" {
+        if e == "test@email.com" && p == "radu" {
             errorMessage = nil
             appState.userEmail = e
             appState.route = .products

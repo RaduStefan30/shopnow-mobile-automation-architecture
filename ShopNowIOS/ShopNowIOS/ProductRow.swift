@@ -1,10 +1,3 @@
-//
-//  ProductRow.swift
-//  ShopNowIOS
-//
-//  Created by Radu-Stefan Ranzascu on 21.12.2025.
-//
-
 import SwiftUI
 
 struct ProductRow: View {
@@ -25,6 +18,7 @@ struct ProductRow: View {
                     .scaledToFill()
                     .frame(height: 180)
                     .clipped()
+                    .accessibilityIdentifier("productCard_\(product.id)")
 
                 Button {
                     appState.toggleFavorite(productId: product.id)
@@ -39,6 +33,7 @@ struct ProductRow: View {
                 .buttonStyle(.plain)
                 .padding(10)
                 .accessibilityIdentifier("favToggle_\(product.id)")
+                .accessibilityValue(isFavorite ? "on" : "off")
             }
 
             HStack(alignment: .top, spacing: 12) {
@@ -73,6 +68,5 @@ struct ProductRow: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(.black.opacity(0.06), lineWidth: 1)
         )
-        .accessibilityIdentifier("productCard_\(product.id)")
     }
 }

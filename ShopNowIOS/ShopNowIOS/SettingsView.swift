@@ -101,7 +101,13 @@ struct SettingsView: View {
             .padding(.horizontal, 16)
             .padding(.top, 12)
             .padding(.bottom, 16)
-            .accessibilityIdentifier("settingsScreen")
         }
+        .background(
+            Color.clear
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .accessibilityElement()
+                .accessibilityIdentifier("settingsScreen")
+                .allowsHitTesting(false)
+        )
     }
 }

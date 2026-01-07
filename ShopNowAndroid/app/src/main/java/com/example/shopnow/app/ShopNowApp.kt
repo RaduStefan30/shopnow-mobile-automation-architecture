@@ -33,7 +33,9 @@ fun ShopNowApp() {
     val scope = rememberCoroutineScope()
 
     val errorMessageState = remember { mutableStateOf<String?>(null) }
-    val validEmail = "test"
+
+    // in a real application this would never be here or in plain text
+    val validEmail = "test@email.com"
     val validPassword = "radu"
 
     fun loadProducts(initial: Boolean) {

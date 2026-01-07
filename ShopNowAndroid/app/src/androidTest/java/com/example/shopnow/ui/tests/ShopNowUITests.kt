@@ -14,7 +14,7 @@ class ShopNowUiTests {
     @get:Rule
     val rule = createAndroidComposeRule<MainActivity>()
 
-    private val validEmail = "test"
+    private val validEmail = "test@email.com"
     private val validPassword = "radu"
 
     /**
