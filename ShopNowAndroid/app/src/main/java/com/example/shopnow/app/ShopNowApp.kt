@@ -9,6 +9,7 @@ import com.example.shopnow.features.products.ProductDetailScreen
 import com.example.shopnow.features.products.ProductListScreen
 import com.example.shopnow.features.products.ProductListUiState
 import com.example.shopnow.features.settings.SettingsScreen
+import android.os.Trace
 
 private enum class AppRoute {
     LOGIN,
@@ -42,7 +43,9 @@ fun ShopNowApp() {
         scope.launch {
             if (!initial) isRefreshing = true
             try {
+                Trace.beginSection("SHOPNOW_FETCH_PRODUCTS")
                 val items = backend.fetchProducts()
+                Trace.endSection()
                 productsUiState = ProductListUiState.Data(items)
             } catch (_: Throwable) {
                 productsUiState = ProductListUiState.Error("Failed to load products")
