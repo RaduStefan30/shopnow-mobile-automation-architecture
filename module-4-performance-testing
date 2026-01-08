@@ -1,0 +1,127 @@
+# Module 4 — Performance Testing
+
+This document captures **repeatable performance measurements** for ShopNow (Android + iOS), using **platform-native tracing tools** or **explicit markers** where applicable.
+
+---
+
+## 1. Goals
+
+Measure and document:
+
+* **App cold start** (time until the first usable screen is displayed)
+* **Product list fetch latency** (time from fetch trigger until UI can display products)
+
+---
+
+## 2. Methodology
+
+### 2.1 Definitions
+
+* **Cold start (TTID / Ready UI)**
+  Time from app launch to the moment the first screen is **actually visible and usable** (Login screen).
+
+* **Fetch Products latency**
+  Time from “fetch trigger” to “products ready to render”.
+  In ShopNow this includes an **intentional fake backend delay** to demonstrate async handling.
+
+---
+
+## 3. Android Measurements
+
+### 3.1 Cold Start (TTID)
+
+* **Tool:** Perfetto System Trace
+* **Metric source:** `android_startup` metric (startup_type = cold)
+* **Metric:** `time_to_initial_display` (TTID)
+
+**Result (Android Cold Start):**
+
+* **TTID (cold):** **953.142 ms**
+* **Time to first frame:** **968.079 ms**
+
+**Evidence:** Perfetto `android_startup` output:
+
+* `time_to_initial_display = 953142084 ns`
+* `to_first_frame.dur_ms = 968.079167`
+
+---
+
+### 3.2 Product List Fetch
+
+* **Tool:** Perfetto System Trace (custom marker)
+* **Marker:** `SHOPNOW_FETCH_PRODUCTS`
+
+**Result (Android Fetch Products):**
+
+* **Total:** ~**2.5 s**
+* **Running:** ~**83.15 ms**
+* **Idle / waiting:** ~**2.42 s**
+
+**Interpretation:**
+
+* Most of the time is **intentional waiting** (fake backend delay), not CPU work.
+* The UI stays responsive while async work completes.
+
+---
+
+## 4. iOS Measurements
+
+### 4.1 Cold Start
+
+* **Tool:** Instruments (App Launch template)
+* **Technique:** Points of Interest signpost (custom marker)
+* **Marker:** `SHOPNOW_COLD_START`
+
+**Result (iOS Cold Start):**
+
+* **SHOPNOW_COLD_START:** **901.92 ms**
+
+**Evidence:** Instruments “Points of Interest” table row:
+
+* Name: `SHOPNOW_COLD_START`
+* Duration: `901.92 ms`
+
+---
+
+### 4.2 Product List Fetch
+
+* **Tool:** Instruments (Points of Interest signpost)
+* **Marker:** `SHOPNOW_FETCH_PRODUCTS`
+
+**Result (iOS Fetch Products):**
+
+* **SHOPNOW_FETCH_PRODUCTS:** **2.60 s**
+
+**Evidence:** Instruments “Points of Interest” table row:
+
+* Name: `SHOPNOW_FETCH_PRODUCTS`
+* Duration: `2.60 s`
+
+---
+
+## 5. Summary Table
+
+| Platform | Metric                   | Tool                       | Result         |
+| -------- | ------------------------ | -------------------------- | -------------- |
+| Android  | Cold start (TTID)        | Perfetto `android_startup` | **953.142 ms** |
+| Android  | Time to first frame      | Perfetto `android_startup` | **968.079 ms** |
+| Android  | Fetch Products total     | Perfetto marker            | **~2.5 s**     |
+| Android  | Fetch Products running   | Perfetto marker            | **~83.15 ms**  |
+| Android  | Fetch Products idle/wait | Perfetto marker            | **~2.42 s**    |
+| iOS      | Cold start (Ready UI)    | Instruments + POI          | **901.92 ms**  |
+| iOS      | Fetch Products total     | Instruments + POI          | **2.60 s**     |
+
+---
+
+## 6. Notes & Limitations
+
+* **Fake backend delay is intentional** (2.5s class-level delay) to demonstrate:
+
+  * async handling
+  * stable automation expectations (predictable loading state)
+
+* For production-grade reporting, results should be gathered across:
+
+  * multiple devices (low/mid/high)
+  * multiple runs (median, p90)
+  * CI/device farm runs to reduce local machine influence
