@@ -7,6 +7,10 @@
 
 
 import SwiftUI
+import os
+
+private let launchLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "ShopNowIOS",
+                              category: "PointsOfInterest")
 
 struct LoginView: View {
 
@@ -15,6 +19,7 @@ struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var errorMessage: String?
+    @State private var didMarkReady = false
 
     private let peach = Color(red: 1.0, green: 0.92, blue: 0.92) // ~#FFEBEB
     private let primary = Color(red: 0.46, green: 0.33, blue: 1.0) // close to your purple
@@ -111,6 +116,11 @@ struct LoginView: View {
                     Spacer()
                 }
             }
+        }
+        .onAppear {
+            guard !didMarkReady else { return }
+            didMarkReady = true
+            os_signpost(.end, log: launchLog, name: "SHOPNOW_COLD_START")
         }
     }
 
